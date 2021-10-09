@@ -13,16 +13,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type users struct {
+type Users struct {
 	id 			string 
-	name		string
+	usrName		string
 	Email 		string
 	Password 	string
 	Posts		*[]string
 }
 
-func addUser(w http.ResponseWriter, r *http.Request) {
-
+func AddUser(w http.ResponseWriter, r *http.Request) {
 	if(r.Method == "POST") {
 		conn := database.InitiateMongoClient()
 		db := conn.Database("golangREST")
@@ -31,34 +30,32 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 		defer cancel() 
 
 		r.ParseForm()
-		user := users{
+		user := Users{
 			id: 		uuid.New().String(),
-			name: 		r.Form["name"][0],
+			usrName: 		r.Form["name"][0],
 			Email: 		r.Form["email"][0],
 			Password: 	r.Form["password"][0],
 		}
 		hash, err := auth.HashPassword(user.Password)
 		if (err!=nil) {
-			log.Fatal(err)
+			fmt.Fprintf(w, "Unable to hash password. \n%s", err)
 		}
 		result, err := collection.InsertOne(ctx, bson.M{
 			"id": 		user.id,
-			"name": 	user.name,
+			"name": 	user.usrName,
 			"Email": 	user.Email,
 			"Password": hash, 
 			"Posts": 	user.Posts,
 		})
 		if (err!=nil) {
-			log.Fatal(err)
+			fmt.Fprintf(w, "Unable to insert database. \n%s", err)
 		}
 
 		fmt.Fprintf(w, "Inserted a single user document: %v\n", result.InsertedID)
+		fmt.Fprintf(w, "User UUID: %v\n", user.id)
+
 		log.Printf("Write Data Successfully")
 	}else {
 		fmt.Fprintf(w, "Invalid Request")
 	}
-}
-
-func init() {
-	http.HandleFunc("/addUser", addUser)
 }
