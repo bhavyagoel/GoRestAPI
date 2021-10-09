@@ -4,6 +4,7 @@ import (
 	auth "RestAPI/auth"
 	database "RestAPI/database"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -38,7 +39,10 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		}
 		hash, err := auth.HashPassword(user.Password)
 		if (err!=nil) {
-			fmt.Fprintf(w, "Unable to hash password. \n%s", err)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(bson.M{"message": "Unable to hash password"})
+			return 
 		}
 		result, err := collection.InsertOne(ctx, bson.M{
 			"id": 		user.id,
@@ -48,14 +52,22 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 			"Posts": 	user.Posts,
 		})
 		if (err!=nil) {
-			fmt.Fprintf(w, "Unable to insert database. \n%s", err)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(bson.M{"message": "Unable to insert database"})
+			return
 		}
 
-		fmt.Fprintf(w, "Inserted a single user document: %v\n", result.InsertedID)
-		fmt.Fprintf(w, "User UUID: %v\n", user.id)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bson.M{
+			"message" : "User added successfully",
+			"result" : result,
+		});
 
 		log.Printf("Write Data Successfully")
 	}else {
+		w.WriteHeader((http.StatusMethodNotAllowed))
 		fmt.Fprintf(w, "Invalid Request")
 	}
 }

@@ -2,6 +2,7 @@ package Insta
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -55,14 +56,18 @@ func AddInstaPost(w http.ResponseWriter, r *http.Request) {
 		user := getDat.FetchUser(post.userID)
 
 		if (user == nil) {
-			fmt.Fprintf(w, "No Document with id: %s\n", post.userID)
-
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(bson.M{"message": "No document with given UID"})
+			return
 		} else{
 			
 			res, err := AddPostUser(post.userID, post.fileName)
 			if (err != nil) {
-				fmt.Fprintf(w, "Error updating user db: %s\n", err)
-				panic(err)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(bson.M{"message": "Error updating user db"})
+				return 
 			}
 
 			conn := database.InitiateMongoClient()
@@ -85,9 +90,17 @@ func AddInstaPost(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Fprintf(w, "Unable to upload document")
 			}else {
-				fmt.Fprintf(w, "Inserted a single document: %v\n", result.InsertedID)
-				fmt.Fprintf(w, "Updated user with ID: %v\n", res.UpsertedID)
-				fmt.Fprintf(w, "File size: %v\n", fileSize)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(bson.M{
+					"message": 	"Successfully uploaded",
+					"id":      	result.InsertedID,
+					"fileName": filename,
+					"fileSize": fileSize,
+					"user": 	user,
+					"post": 	post,
+					"result": 	res,
+				})
 				log.Printf("Write Data Successfully")
 			}
 			
