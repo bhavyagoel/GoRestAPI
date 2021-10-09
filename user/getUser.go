@@ -21,7 +21,7 @@ func FetchUser(userID string) bson.M {
 	err := collection.FindOne(ctx, bson.M{"id": userID}).Decode(&user)
 	if (err != nil) {
 		return nil
-	} 
+	}
 	return user
 }
 
@@ -29,7 +29,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	if(r.Method=="GET") {
 
 		r.ParseForm()
-		id := r.Form["id"][0]
+		id := r.Form["userID"][0]
 
 		user := FetchUser(id)
 		if (user == nil) {
