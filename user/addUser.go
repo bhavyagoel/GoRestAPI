@@ -19,7 +19,7 @@ type Users struct {
 	usrName		string
 	Email 		string
 	Password 	string
-	Posts		*[]string
+	post		*[]string
 }
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +33,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		user := Users{
 			id: 		uuid.New().String(),
-			usrName: 		r.Form["name"][0],
+			usrName: 	r.Form["name"][0],
 			Email: 		r.Form["email"][0],
 			Password: 	r.Form["password"][0],
 		}
@@ -49,7 +49,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 			"name": 	user.usrName,
 			"Email": 	user.Email,
 			"Password": hash, 
-			"Posts": 	user.Posts,
+			"post": 	user.post,
 		})
 		if (err!=nil) {
 			w.Header().Set("Content-Type", "application/json")
