@@ -91,6 +91,22 @@ To add A post Under a user with a given Id following are the query  parma
 | `fileName` | `string` | Unique fileName Generated ```github.com/google/uuid``` |
 | `userId` | `string`  | ```userId``` that links the post and the user|
 
+```json
+{
+    "fileName": "3b59e4c8-9c75-4e4d-a716-4d18f1e5d22e.jpg",
+    "fileSize": 171959,
+    "id": "6161eb3a2318903450b28e0e",
+    "message": "Successfully uploaded",
+    "post": {},
+    "user": {
+        "Email": "\"jane_doe@testing.com\"",
+        "Password": "$2a$14$r/yybaVD9/JgjSY8sP5.XezjyBLzHrARar175YBuneKAYvn5r26hO",
+        "_id": "6161eb1c2318903450b28e0a",
+        "id": "d3e1fd98-0348-429f-9963-de9433960276",
+        "name": "\"Jane Doe\"\n"
+    }
+}
+```
 ## Testing
 
 To run tests, run the following command
