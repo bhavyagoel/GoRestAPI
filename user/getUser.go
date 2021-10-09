@@ -36,16 +36,10 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNotFound)
 			json.NewEncoder(w).Encode(bson.M{"message": "User not found"})
-			// fmt.Fprintf(w, "No Document with id: %s\n", id)
 		}else {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 		    json.NewEncoder(w).Encode(user);
-			// fmt.Fprintf(w, "User found with id: %s\n", id)
-			// fmt.Fprintf(w, "User found with email: %s\n", user["Email"])
-			// fmt.Fprintf(w, "User found with name: %v\n", user["name"])
-			// fmt.Fprintf(w, "User found with hashed Password: %s\n", user["Password"])
-			// fmt.Fprintf(w, "User found with posts: %v\n", user["Posts"])		
 		}
 	} else {
 		w.WriteHeader((http.StatusMethodNotAllowed))
