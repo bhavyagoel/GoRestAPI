@@ -3,7 +3,6 @@ package Insta
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Article struct {
@@ -28,16 +26,17 @@ type Article struct {
 }
 
 
-func AddPostUser(userID string, fileName string) (mongo.UpdateResult, error) {
+func AddPostUser(userID string, fileName string) error {
 	conn := database.InitiateMongoClient();
 	collection := conn.Database("golangREST").Collection("Users")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := collection.UpdateOne(ctx, 
+	_, err := collection.UpdateOne(ctx, 
 		bson.M{"id": userID}, 
 		bson.M{"$push": bson.M{"post": fileName}})
-	return *result, err
+
+	return err
 }
 
 
@@ -62,7 +61,7 @@ func AddInstaPost(w http.ResponseWriter, r *http.Request) {
 			return
 		} else{
 			
-			res, err := AddPostUser(post.userID, post.fileName)
+			err := AddPostUser(post.userID, post.fileName)
 			if (err != nil) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusNotFound)
@@ -88,7 +87,9 @@ func AddInstaPost(w http.ResponseWriter, r *http.Request) {
 			fileSize := uploadPost.UploadFile(post.urlToImage, filename)
 	
 			if err != nil {
-				fmt.Fprintf(w, "Unable to upload document")
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(bson.M{"message": "Unable to upload document"})
 			}else {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
@@ -99,7 +100,6 @@ func AddInstaPost(w http.ResponseWriter, r *http.Request) {
 					"fileSize": fileSize,
 					"user": 	user,
 					"post": 	post,
-					"result": 	res,
 				})
 				log.Printf("Write Data Successfully")
 			}
