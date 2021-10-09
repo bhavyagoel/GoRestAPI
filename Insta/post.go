@@ -26,7 +26,7 @@ type article struct {
 func addInstaPost(w http.ResponseWriter, r *http.Request) {
 	if (r.Method == "POST") {
 		conn := database.InitiateMongoClient()
-		db := conn.Database("AppointyREST")
+		db := conn.Database("golangREST")
 		collection := db.Collection("InstPost")
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()

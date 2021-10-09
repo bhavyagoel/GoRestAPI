@@ -19,7 +19,7 @@ func UploadFile(file, filename string) int {
 	}
 	conn := database.InitiateMongoClient()
 	bucket, err := gridfs.NewBucket(
-		conn.Database("AppointyREST"),
+		conn.Database("golangREST"),
 	)
 	if err != nil {
 		log.Fatal(err)

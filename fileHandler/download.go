@@ -18,7 +18,7 @@ func DownloadFile(fileName string) int64 {
 	conn := database.InitiateMongoClient()
 
 	// For CRUD operations, here is an example
-	db := conn.Database("AppointyREST")
+	db := conn.Database("golangREST")
 	fsFiles := db.Collection("fs.files")
 	ctx, cancel:= context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
